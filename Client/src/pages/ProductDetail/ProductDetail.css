@@ -1,0 +1,618 @@
+.pd-page {
+  padding: var(--space-xl) 0 var(--space-3xl);
+  min-height: 80vh;
+}
+
+.pd-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.pd-breadcrumb a {
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.pd-breadcrumb a:hover { color: var(--green-bright); }
+.pd-breadcrumb span:last-child { color: var(--text-secondary); }
+
+/* Main layout */
+.pd-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  margin-bottom: var(--space-3xl);
+  align-items: start;
+}
+
+/* Image */
+.pd-image-main {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.pd-image-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  opacity: 0.3;
+}
+
+.pd-oos-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Info column */
+.pd-badges {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.pd-category {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.pd-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+
+.pd-strain-name {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.pd-rating-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.pd-rating-num {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--gold);
+}
+
+.pd-review-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Cannabinoids */
+.pd-cannabinoids {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.pd-cannabinoid {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 80px;
+}
+
+.pd-cannabinoid.thc {
+  background: rgba(124,106,224,0.1);
+  border: 1px solid rgba(124,106,224,0.25);
+}
+
+.pd-cannabinoid.cbd {
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.25);
+}
+
+.pd-cann-label {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.pd-cannabinoid.thc .pd-cann-value { color: #a090f0; font-size: 1.1rem; font-weight: 700; font-family: var(--font-mono); }
+.pd-cannabinoid.cbd .pd-cann-value { color: #4ecdc4; font-size: 1.1rem; font-weight: 700; font-family: var(--font-mono); }
+
+.pd-strain-type {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+
+.pd-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin-bottom: var(--space-lg);
+}
+
+/* Effects/Flavors */
+.pd-detail-label {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.pd-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.pd-tag {
+  padding: 5px 14px;
+  background: var(--green-glow);
+  border: 1px solid var(--border-green);
+  border-radius: var(--radius-pill);
+  font-size: 0.775rem;
+  color: var(--green-bright);
+  transition: all var(--transition);
+}
+
+.pd-tag:hover {
+  background: var(--green-muted);
+}
+
+.pd-tag-gold {
+  background: var(--gold-dim);
+  border-color: var(--border-gold);
+  color: var(--gold);
+}
+
+/* Purchase area */
+.pd-purchase {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.pd-price-block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.pd-price {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.pd-original-price {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.pd-weight {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.pd-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.pd-qty {
+  display: flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pd-qty-btn {
+  width: 38px;
+  height: 44px;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.pd-qty-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.pd-qty-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.pd-qty-num {
+  width: 40px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.pd-add-btn {
+  flex: 1;
+  padding: 12px;
+}
+
+.pd-wishlist-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pd-wishlist-btn:hover, .pd-wishlist-btn.active {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-dim);
+}
+
+.pd-delivery-info {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* Tabs */
+.pd-tabs-section {
+  margin-bottom: var(--space-3xl);
+}
+
+.pd-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-xl);
+  gap: var(--space-xs);
+}
+
+.pd-tab {
+  padding: 12px var(--space-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.pd-tab:hover { color: var(--text-secondary); }
+.pd-tab.active {
+  color: var(--green-bright);
+  border-bottom-color: var(--green-bright);
+}
+
+.pd-tab-content {
+  min-height: 200px;
+}
+
+/* Details tab */
+.pd-detail-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.pd-detail-title {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.pd-detail-block p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.pd-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.pd-detail-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pd-detail-key {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.pd-detail-val {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Terpenes tab */
+.pd-terpenes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+.terpene-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.terpene-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.terpene-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.terpene-pct {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--green-bright);
+}
+
+.terpene-track {
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.terpene-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-primary), var(--green-bright));
+  border-radius: var(--radius-pill);
+  transition: width 0.6s var(--ease);
+}
+
+/* Reviews tab */
+.pd-review-form-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.pd-review-form-wrap h4 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.pd-review-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pd-review-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.star.interactive {
+  cursor: pointer;
+  font-size: 22px;
+  transition: transform var(--transition);
+}
+
+.star.interactive:hover {
+  transform: scale(1.2);
+}
+
+.pd-review-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.pd-review-signin {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.pd-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pd-review-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.pd-review-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.pd-reviewer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-muted);
+  color: var(--green-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.pd-reviewer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 4px;
+}
+
+.pd-reviewer-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pd-verified {
+  font-size: 0.7rem;
+  color: var(--green-bright);
+  background: var(--green-glow);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.pd-review-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.pd-review-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.pd-review-body {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.pd-no-data {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  padding: var(--space-xl) 0;
+}
+
+.pd-related {
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--border);
+}
+
+.pd-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .pd-main { grid-template-columns: 1fr; }
+  .pd-terpenes-grid { grid-template-columns: 1fr; }
+  .pd-detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .pd-detail-grid { grid-template-columns: 1fr; }
+  .pd-add-row { flex-wrap: wrap; }
+  .pd-add-btn { flex: 1 1 100%; order: 3; }
+}
