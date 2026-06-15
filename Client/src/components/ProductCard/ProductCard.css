@@ -1,0 +1,241 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-slow);
+  position: relative;
+}
+
+.product-card:hover {
+  border-color: var(--border-green);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(82, 183, 136, 0.1);
+  transform: translateY(-3px);
+}
+
+/* Image */
+.product-card-img-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  display: block;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+
+.product-card:hover .product-card-img {
+  transform: scale(1.05);
+}
+
+.product-card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--text-muted);
+}
+
+/* Badges */
+.product-card-badges {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-card-oos {
+  background: rgba(0,0,0,0.6);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+/* Wishlist button */
+.product-card-wishlist {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 32px;
+  height: 32px;
+  background: rgba(13,15,14,0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+  opacity: 0;
+}
+
+.product-card:hover .product-card-wishlist {
+  opacity: 1;
+}
+
+.product-card-wishlist:hover,
+.product-card-wishlist.active {
+  background: var(--bg-card);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Body */
+.product-card-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+
+.product-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.product-card-category {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.product-strain-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.product-strain-badge.strain-indica { color: #7c6ae0; border-color: rgba(124,106,224,0.3); }
+.product-strain-badge.strain-sativa { color: #e07c3a; border-color: rgba(224,124,58,0.3); }
+.product-strain-badge.strain-hybrid { color: var(--green-bright); border-color: var(--border-green); }
+.product-strain-badge.strain-cbd { color: #4ecdc4; border-color: rgba(78,205,196,0.3); }
+
+.product-card-name {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+  transition: color var(--transition);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card-name:hover {
+  color: var(--green-bright);
+}
+
+/* Cannabinoids */
+.product-card-cannabinoids {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.cannabinoid-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+}
+
+.cannabinoid-pill.thc {
+  background: rgba(124, 106, 224, 0.1);
+  border: 1px solid rgba(124, 106, 224, 0.2);
+}
+
+.cannabinoid-pill.cbd {
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid rgba(78, 205, 196, 0.2);
+}
+
+.cannabinoid-label {
+  color: var(--text-muted);
+}
+
+.cannabinoid-pill.thc .cannabinoid-value { color: #a090f0; }
+.cannabinoid-pill.cbd .cannabinoid-value { color: #4ecdc4; }
+
+.product-card-weight {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Rating */
+.product-card-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.product-card-review-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Footer */
+.product-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
+}
+
+.product-card-price-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.product-card-price {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.product-card-original {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.product-card-add {
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  gap: 4px;
+  flex-shrink: 0;
+}
