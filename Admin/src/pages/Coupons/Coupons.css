@@ -1,0 +1,111 @@
+.coupons-page {}
+
+.coupon-form-card { margin-bottom: var(--space-md); overflow: visible; }
+
+.coupon-form-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.coupon-form-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.coupon-form {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.coupon-code-input {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.coupon-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.coupon-active-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.coupon-active-toggle input[type="checkbox"] {
+  accent-color: var(--green-bright);
+  width: 15px;
+  height: 15px;
+}
+
+.coupon-form-actions { display: flex; gap: var(--space-sm); }
+
+.coupons-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.coupons-empty span { font-size: 2.5rem; opacity: 0.4; }
+
+/* Table cells */
+.coupon-code-cell {
+  font-family: var(--font-mono);
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--green-bright);
+  letter-spacing: 0.06em;
+  background: var(--green-glow);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-green);
+}
+
+.coupon-desc { font-size: 0.8rem; color: var(--text-secondary); }
+
+.coupon-discount {
+  font-family: var(--font-mono);
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.coupon-max-note {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.coupon-min { font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); }
+
+.coupon-usage {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.coupon-expiry { font-size: 0.775rem; font-family: var(--font-mono); }
+
+.coupon-delete-btn { padding: 5px 12px; font-size: 0.75px; }
