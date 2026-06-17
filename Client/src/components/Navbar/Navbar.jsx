@@ -6,8 +6,7 @@ import SearchOverlay from '../SearchOverlay/SearchOverlay'
 import './Navbar.css'
 
 const Navbar = () => {
-  const { token, user, logout, getCartCount } = useContext(StoreContext)
-  const [showLogin, setShowLogin] = useState(false)
+  const { token, user, logout, getCartCount, showLoginModal, openLoginModal, closeLoginModal } = useContext(StoreContext)
   const [showSearch, setShowSearch] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -41,7 +40,7 @@ const Navbar = () => {
 
   return (
     <>
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+      {showLoginModal && <LoginModal onClose={closeLoginModal} />}
       {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
 
       <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
@@ -91,7 +90,7 @@ const Navbar = () => {
             </Link>
 
             {!token ? (
-              <button className="btn btn-primary navbar-signin" onClick={() => setShowLogin(true)}>
+              <button className="btn btn-primary navbar-signin" onClick={openLoginModal}>
                 Sign In
               </button>
             ) : (
@@ -170,7 +169,7 @@ const Navbar = () => {
                 <button onClick={() => { handleLogout(); setMobileOpen(false) }}>Sign Out</button>
               </>
             ) : (
-              <button onClick={() => { setShowLogin(true); setMobileOpen(false) }}>Sign In</button>
+              <button onClick={() => { openLoginModal(); setMobileOpen(false) }}>Sign In</button>
             )}
           </div>
         )}

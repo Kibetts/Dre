@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 import { StoreContext } from '../../context/StoreContext'
 import ProductCard from '../../components/ProductCard/ProductCard'
+import productService from '../../services/productService.js'
+import reviewService from '../../services/reviewService.js'
+import { getImageUrl } from '../../utils/helpers.js'
 import './ProductDetail.css'
 
 const Stars = ({ rating, interactive, onRate }) => (
@@ -32,7 +34,7 @@ const TerpeneBar = ({ name, percentage }) => (
 
 const ProductDetail = () => {
   const { id } = useParams()
-  const { addToCart, toggleWishlist, isInWishlist, token, user, url } = useContext(StoreContext)
+  const { addToCart, toggleWishlist, isInWishlist, token, user, url, openLoginModal } = useContext(StoreContext)
   const [product, setProduct] = useState(null)
   const [related, setRelated] = useState([])
   const [reviews, setReviews] = useState([])
@@ -45,23 +47,26 @@ const ProductDetail = () => {
   const [submittingReview, setSubmittingReview] = useState(false)
 
   useEffect(() => {
+    let isMounted = true
     const load = async () => {
       setLoading(true)
       try {
         const [prodRes, relRes, revRes] = await Promise.all([
-          axios.get(`${url}/api/product/${id}`),
-          axios.get(`${url}/api/product/${id}/related`),
-          axios.get(`${url}/api/review/product/${id}`)
+          productService.getById(id),
+          productService.getRelated(id),
+          reviewService.getByProduct(id),
         ])
+        if (!isMounted) return
         if (prodRes.data.success) setProduct(prodRes.data.data)
         if (relRes.data.success) setRelated(relRes.data.data)
         if (revRes.data.success) setReviews(revRes.data.data)
       } catch (e) { console.error(e) }
-      finally { setLoading(false) }
+      finally { if (isMounted) setLoading(false) }
     }
     load()
     window.scrollTo(0, 0)
-  }, [id, url])
+    return () => { isMounted = false }
+  }, [id])
 
   const handleAddToCart = () => {
     for (let i = 0; i < qty; i++) addToCart(product._id)
@@ -73,10 +78,7 @@ const ProductDetail = () => {
     if (!token) { toast.info('Sign in to leave a review'); return }
     setSubmittingReview(true)
     try {
-      const res = await axios.post(`${url}/api/review/add`,
-        { productId: id, ...reviewForm },
-        { headers: { token } }
-      )
+      const res = await reviewService.add(id, reviewForm)
       if (res.data.success) {
         toast.success('Review submitted!')
         setReviews(prev => [res.data.data, ...prev])
@@ -96,7 +98,7 @@ const ProductDetail = () => {
     </div>
   )
 
-  const imgSrc = product.image ? `${url}/images/${product.image}` : null
+  const imgSrc = getImageUrl(product.image, url)
   const displayPrice = product.salePrice || product.price
   const inWishlist = isInWishlist(product._id)
 
@@ -362,7 +364,14 @@ const ProductDetail = () => {
                     </form>
                   ) : (
                     <p className="pd-review-signin">
-                      <Link to="#" style={{ color: 'var(--green-bright)' }}>Sign in</Link> to leave a review.
+                      <button
+                        type="button"
+                        className="pd-review-signin-link"
+                        style={{ color: 'var(--green-bright)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit', textDecoration: 'underline' }}
+                        onClick={openLoginModal}
+                      >
+                        Sign in
+                      </button> to leave a review.
                     </p>
                   )}
                 </div>

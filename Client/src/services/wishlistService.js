@@ -18,8 +18,6 @@ export default wishlistService
 // client/src/services/categoryService.js
 // ─────────────────────────────────────────────────────────────────────────────
 
-import api from './api.js'
-
 export const categoryService = {
   /** Get all active categories */
   getAll: () =>

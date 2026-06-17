@@ -1,26 +1,29 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 import { StoreContext } from '../../context/StoreContext'
 import ProductCard from '../../components/ProductCard/ProductCard'
+import wishlistService from '../../services/wishlistService.js'
 import './Wishlist.css'
 
 const Wishlist = () => {
-  const { token, url } = useContext(StoreContext)
+  const { token } = useContext(StoreContext)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!token) { setLoading(false); return }
+    let isMounted = true
     const fetch = async () => {
       try {
-        const res = await axios.get(`${url}/api/wishlist`, { headers: { token } })
+        const res = await wishlistService.get()
+        if (!isMounted) return
         if (res.data.success) setItems(res.data.data)
       } catch (e) { console.error(e) }
-      finally { setLoading(false) }
+      finally { if (isMounted) setLoading(false) }
     }
     fetch()
-  }, [token, url])
+    return () => { isMounted = false }
+  }, [token])
 
   if (!token) return (
     <div className="wishlist-page">

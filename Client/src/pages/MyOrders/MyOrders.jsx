@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 import { StoreContext } from '../../context/StoreContext'
+import orderService from '../../services/orderService.js'
+import { formatOrderNumber, formatDate } from '../../utils/formatters.js'
+import { getImageUrl } from '../../utils/helpers.js'
 import './MyOrders.css'
 
 const STATUS_COLORS = {
@@ -32,15 +34,18 @@ const MyOrders = () => {
 
   useEffect(() => {
     if (!token) return
+    let isMounted = true
     const fetchOrders = async () => {
       try {
-        const res = await axios.post(`${url}/api/order/userorders`, {}, { headers: { token } })
+        const res = await orderService.getMyOrders()
+        if (!isMounted) return
         if (res.data.success) setOrders(res.data.data)
       } catch (e) { console.error(e) }
-      finally { setLoading(false) }
+      finally { if (isMounted) setLoading(false) }
     }
     fetchOrders()
-  }, [token, url])
+    return () => { isMounted = false }
+  }, [token])
 
   if (!token) return (
     <div className="orders-page">
@@ -82,8 +87,8 @@ const MyOrders = () => {
                 >
                   <div className="order-card-left">
                     <div>
-                      <p className="order-number">Order #{order.orderNumber || order._id.slice(-8).toUpperCase()}</p>
-                      <p className="order-date">{new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <p className="order-number">Order #{formatOrderNumber(order)}</p>
+                      <p className="order-date">{formatDate(order.createdAt)}</p>
                     </div>
                     <span
                       className="order-status-badge"
@@ -115,7 +120,7 @@ const MyOrders = () => {
                         <div key={idx} className="order-item">
                           <div className="order-item-img">
                             {item.image
-                              ? <img src={`${url}/images/${item.image}`} alt={item.name} />
+                              ? <img src={getImageUrl(item.image, url)} alt={item.name} />
                               : <span>🌿</span>}
                           </div>
                           <div className="order-item-info">

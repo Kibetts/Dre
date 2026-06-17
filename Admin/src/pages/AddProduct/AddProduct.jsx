@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
+import adminServices from '../../services/adminServices.js'
+import { getImageUrl } from '../../utils/adminUtils.js'
 import './AddProduct.css'
 
 const CATEGORIES = ['Flower', 'Pre-Rolls', 'Edibles', 'Concentrates', 'Vapes', 'CBD', 'Tinctures', 'Topicals', 'Accessories']
@@ -19,7 +20,7 @@ const defaultForm = {
   tags: '',
 }
 
-const AddProduct = ({ url, token, editMode = false }) => {
+const AddProduct = ({ url, editMode = false }) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [form, setForm] = useState(defaultForm)
@@ -29,8 +30,12 @@ const AddProduct = ({ url, token, editMode = false }) => {
   const [terpenes, setTerpenes] = useState([])
 
   useEffect(() => {
-    if (editMode && id) {
-      axios.get(`${url}/api/product/${id}`).then(res => {
+    if (!editMode || !id) return
+    let isMounted = true
+    const loadProduct = async () => {
+      try {
+        const res = await adminServices.products.getById(id)
+        if (!isMounted) return
         if (res.data.success) {
           const p = res.data.data
           setForm({
@@ -48,10 +53,14 @@ const AddProduct = ({ url, token, editMode = false }) => {
             tags: p.tags?.join(', ') || '',
           })
           if (p.terpenes) setTerpenes(p.terpenes)
-          if (p.image) setImagePreview(`${url}/images/${p.image}`)
+          if (p.image) setImagePreview(getImageUrl(p.image, url))
         }
-      })
+      } catch (e) {
+        toast.error('Failed to load product')
+      }
     }
+    loadProduct()
+    return () => { isMounted = false }
   }, [editMode, id, url])
 
   const handleChange = e => {
@@ -106,12 +115,9 @@ const AddProduct = ({ url, token, editMode = false }) => {
         formData.append('terpenes', JSON.stringify(terpenes.filter(t => t.name)))
       }
 
-      const endpoint = editMode
-        ? `${url}/api/product/${id}`
-        : `${url}/api/product/add`
-
-      const method = editMode ? 'put' : 'post'
-      const res = await axios[method](endpoint, formData, { headers: { token } })
+      const res = editMode
+        ? await adminServices.products.update(id, formData)
+        : await adminServices.products.add(formData)
 
       if (res.data.success) {
         toast.success(editMode ? 'Product updated!' : 'Product added!')

@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 import { StoreContext } from '../../context/StoreContext'
 import ProductCard from '../../components/ProductCard/ProductCard'
+import productService from '../../services/productService.js'
 import './Home.css'
 
 const EFFECTS = ['Relaxed', 'Happy', 'Euphoric', 'Creative', 'Focused', 'Sleepy', 'Energetic', 'Uplifted']
@@ -34,16 +34,18 @@ const Stars = ({ count }) => (
 )
 
 const Home = () => {
-  const { categories, url } = useContext(StoreContext)
+  const { categories } = useContext(StoreContext)
   const [featured, setFeatured] = useState([])
   const [bestSellers, setBestSellers] = useState([])
   const [newArrivals, setNewArrivals] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let isMounted = true
     const loadFeatured = async () => {
       try {
-        const res = await axios.get(`${url}/api/product/featured`)
+        const res = await productService.getFeatured()
+        if (!isMounted) return
         if (res.data.success) {
           setFeatured(res.data.data.featured || [])
           setBestSellers(res.data.data.bestSellers || [])
@@ -52,11 +54,12 @@ const Home = () => {
       } catch (e) {
         console.error(e)
       } finally {
-        setLoading(false)
+        if (isMounted) setLoading(false)
       }
     }
     loadFeatured()
-  }, [url])
+    return () => { isMounted = false }
+  }, [])
 
   return (
     <div className="home">

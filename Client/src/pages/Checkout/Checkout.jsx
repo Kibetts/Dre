@@ -1,12 +1,11 @@
 import { useContext, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 import { StoreContext } from '../../context/StoreContext'
+import orderService from '../../services/orderService.js'
+import { CA_TAX_RATE, DELIVERY_FEE } from '../../utils/constants.js'
+import { getImageUrl } from '../../utils/helpers.js'
 import './Checkout.css'
-
-const TAX_RATE = 0.0975
-const DELIVERY_FEE = 9.99
 
 const Checkout = () => {
   const { cartItems, products, getTotalCartAmount, token, user, url } = useContext(StoreContext)
@@ -42,7 +41,7 @@ const Checkout = () => {
   const subtotal = getTotalCartAmount()
   const discount = couponData?.discountAmount || 0
   const deliveryFee = orderType === 'delivery' ? DELIVERY_FEE : 0
-  const tax = (subtotal - discount) * TAX_RATE
+  const tax = (subtotal - discount) * CA_TAX_RATE
   const total = subtotal - discount + deliveryFee + tax
 
   const handleChange = e => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -70,13 +69,13 @@ const Checkout = () => {
         zipCode: form.zipCode,
       }
 
-      const res = await axios.post(`${url}/api/order/place`, {
+      const res = await orderService.place({
         items,
         address,
         orderType,
         couponCode: couponData?.code || '',
         specialInstructions: form.specialInstructions,
-      }, { headers: { token } })
+      })
 
       if (res.data.success) {
         if (res.data.session_url) {
@@ -249,7 +248,7 @@ const Checkout = () => {
                     <div key={p._id} className="checkout-item">
                       <div className="checkout-item-img">
                         {p.image
-                          ? <img src={`${url}/images/${p.image}`} alt={p.name} />
+                          ? <img src={getImageUrl(p.image, url)} alt={p.name} />
                           : <span>🌿</span>}
                         <span className="checkout-item-qty-badge">{qty}</span>
                       </div>

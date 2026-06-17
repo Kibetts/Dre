@@ -1,6 +1,11 @@
-import axios from 'axios'
 import { createContext, useEffect, useState, useCallback } from 'react'
 import { toast } from 'react-toastify'
+import api from '../services/api.js'
+import productService from '../services/productService.js'
+import wishlistService, { categoryService } from '../services/wishlistService.js'
+import userService from '../services/userService.js'
+import { STORAGE_KEYS } from '../utils/constants.js'
+import { getCartTotal } from '../utils/helpers.js'
 
 export const StoreContext = createContext(null)
 
@@ -12,8 +17,11 @@ const StoreContextProvider = ({ children }) => {
   const [categories, setCategories] = useState([])
   const [wishlist, setWishlist] = useState([])
   const [ageVerified, setAgeVerified] = useState(
-    () => localStorage.getItem('gl_age_verified') === 'true'
+    () => localStorage.getItem(STORAGE_KEYS.AGE_VERIFIED) === 'true'
   )
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const openLoginModal = () => setShowLoginModal(true)
+  const closeLoginModal = () => setShowLoginModal(false)
 
   const url = import.meta.env.VITE_SERVER_URL || 'http://localhost:4000'
 
@@ -21,7 +29,7 @@ const StoreContextProvider = ({ children }) => {
     setCartItems(prev => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }))
     if (token) {
       try {
-        await axios.post(url + '/api/cart/add', { itemId }, { headers: { token } })
+        await api.post('/api/cart/add', { itemId })
       } catch (e) { console.error(e) }
     }
     toast.success('Added to cart', { autoClose: 1500 })
@@ -36,7 +44,7 @@ const StoreContextProvider = ({ children }) => {
     })
     if (token) {
       try {
-        await axios.post(url + '/api/cart/remove', { itemId }, { headers: { token } })
+        await api.post('/api/cart/remove', { itemId })
       } catch (e) { console.error(e) }
     }
   }
@@ -44,7 +52,7 @@ const StoreContextProvider = ({ children }) => {
   const clearCart = () => {
     setCartItems({})
     if (token) {
-      axios.post(url + '/api/cart/clear', {}, { headers: { token } }).catch(console.error)
+      api.post('/api/cart/clear', {}).catch(console.error)
     }
   }
 
@@ -52,19 +60,7 @@ const StoreContextProvider = ({ children }) => {
     return Object.values(cartItems).reduce((sum, qty) => sum + qty, 0)
   }
 
-  const getTotalCartAmount = () => {
-    let total = 0
-    for (const itemId in cartItems) {
-      if (cartItems[itemId] > 0) {
-        const product = products.find(p => p._id === itemId)
-        if (product) {
-          const price = product.salePrice || product.price
-          total += price * cartItems[itemId]
-        }
-      }
-    }
-    return Math.round(total * 100) / 100
-  }
+  const getTotalCartAmount = () => getCartTotal(cartItems, products)
 
   const toggleWishlist = async (productId) => {
     if (!token) {
@@ -72,7 +68,7 @@ const StoreContextProvider = ({ children }) => {
       return
     }
     try {
-      const res = await axios.post(url + '/api/wishlist/toggle', { productId }, { headers: { token } })
+      const res = await wishlistService.toggle(productId)
       if (res.data.success) {
         if (res.data.inWishlist) {
           setWishlist(prev => [...prev, productId])
@@ -89,19 +85,18 @@ const StoreContextProvider = ({ children }) => {
 
   const fetchProducts = useCallback(async (params = {}) => {
     try {
-      const queryString = new URLSearchParams(params).toString()
-      const res = await axios.get(`${url}/api/product/list?${queryString}`)
+      const res = await productService.getAll(params)
       if (res.data.success) {
         setProducts(res.data.data)
         return res.data
       }
     } catch (e) { console.error(e) }
     return { data: [] }
-  }, [url])
+  }, [])
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(url + '/api/category/list')
+      const res = await categoryService.getAll()
       if (res.data.success) setCategories(res.data.data)
     } catch (e) {
       // Use defaults if server unavailable
@@ -119,16 +114,16 @@ const StoreContextProvider = ({ children }) => {
     }
   }
 
-  const loadCartData = async (tkn) => {
+  const loadCartData = async () => {
     try {
-      const res = await axios.post(url + '/api/cart/get', {}, { headers: { token: tkn } })
+      const res = await api.post('/api/cart/get', {})
       if (res.data.success) setCartItems(res.data.cartData)
     } catch (e) { console.error(e) }
   }
 
-  const loadWishlist = async (tkn) => {
+  const loadWishlist = async () => {
     try {
-      const res = await axios.get(url + '/api/wishlist', { headers: { token: tkn } })
+      const res = await wishlistService.get()
       if (res.data.success) {
         setWishlist(res.data.data.map(p => p._id || p))
       }
@@ -138,10 +133,10 @@ const StoreContextProvider = ({ children }) => {
   const login = async (tkn, userData) => {
     setToken(tkn)
     setUser(userData)
-    localStorage.setItem('gl_token', tkn)
-    localStorage.setItem('gl_user', JSON.stringify(userData))
-    await loadCartData(tkn)
-    await loadWishlist(tkn)
+    localStorage.setItem(STORAGE_KEYS.TOKEN, tkn)
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData))
+    await loadCartData()
+    await loadWishlist()
   }
 
   const logout = () => {
@@ -149,29 +144,30 @@ const StoreContextProvider = ({ children }) => {
     setUser(null)
     setCartItems({})
     setWishlist([])
-    localStorage.removeItem('gl_token')
-    localStorage.removeItem('gl_user')
+    localStorage.removeItem(STORAGE_KEYS.TOKEN)
+    localStorage.removeItem(STORAGE_KEYS.USER)
   }
 
   const verifyAge = () => {
     setAgeVerified(true)
-    localStorage.setItem('gl_age_verified', 'true')
+    localStorage.setItem(STORAGE_KEYS.AGE_VERIFIED, 'true')
   }
 
   useEffect(() => {
     const init = async () => {
       await fetchProducts()
       await fetchCategories()
-      const savedToken = localStorage.getItem('gl_token')
-      const savedUser = localStorage.getItem('gl_user')
+      const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN)
+      const savedUser = localStorage.getItem(STORAGE_KEYS.USER)
       if (savedToken) {
         setToken(savedToken)
         if (savedUser) setUser(JSON.parse(savedUser))
-        await loadCartData(savedToken)
-        await loadWishlist(savedToken)
+        await loadCartData()
+        await loadWishlist()
       }
     }
     init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -184,6 +180,7 @@ const StoreContextProvider = ({ children }) => {
       fetchProducts, fetchCategories,
       login, logout,
       ageVerified, verifyAge,
+      showLoginModal, openLoginModal, closeLoginModal,
       url
     }}>
       {children}

@@ -1,38 +1,41 @@
-// client/src/services/userService.js
-// Auth and user profile API calls.
+import api from './api.js'
+
+const reviewService = {
+  /** Submit a new review for a product */
+  add: (productId, { rating, title, body }) =>
+    api.post('/api/review/add', { productId, rating, title, body }),
+
+  /** Get all reviews for a given product */
+  getByProduct: (productId) =>
+    api.get(`/api/review/product/${productId}`),
+
+  /** Delete a review (admin) */
+  delete: (id) =>
+    api.delete(`/api/review/${id}`),
+}
+
+export default reviewService
+EOF
+cat /home/claude/audit/project/client/src/services/reviewService.js
+Output
+
+// client/src/services/reviewService.js
+// All product review API calls.
 
 import api from './api.js'
 
-const userService = {
-  /** Register a new account */
-  register: (data) =>
-    api.post('/api/user/register', data),
+const reviewService = {
+  /** Submit a new review for a product */
+  add: (productId, { rating, title, body }) =>
+    api.post('/api/review/add', { productId, rating, title, body }),
 
-  /** Log in — returns { token, user } */
-  login: (email, password) =>
-    api.post('/api/user/login', { email, password }),
+  /** Get all reviews for a given product */
+  getByProduct: (productId) =>
+    api.get(`/api/review/product/${productId}`),
 
-  /** Fetch the current user's full profile */
-  getProfile: () =>
-    api.get('/api/user/profile'),
-
-  /** Update name, phone, newsletter preference */
-  updateProfile: (data) =>
-    api.put('/api/user/profile', data),
-
-  /** Add a delivery address to the user's profile */
-  addAddress: (address) =>
-    api.post('/api/user/address', { address }),
-
-  // ── Admin ──
-
-  /** List all registered customers (admin) */
-  listAll: () =>
-    api.get('/api/user/list'),
-
-  /** Get user count analytics (admin) */
-  getAnalytics: () =>
-    api.get('/api/user/analytics'),
+  /** Delete a review (admin) */
+  delete: (id) =>
+    api.delete(`/api/review/${id}`),
 }
 
-export default userService
+export default reviewService

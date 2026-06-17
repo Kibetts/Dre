@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import { Link } from 'react-router-dom'
+import adminServices from '../../services/adminServices.js'
+import { ORDER_STATUS_COLORS } from '../../utils/adminUtils.js'
 import './Dashboard.css'
 
 const StatCard = ({ icon, label, value, sub, color }) => (
@@ -13,33 +15,34 @@ const StatCard = ({ icon, label, value, sub, color }) => (
   </div>
 )
 
-const Dashboard = ({ url, token }) => {
+const Dashboard = () => {
   const [orderStats, setOrderStats] = useState(null)
   const [userStats, setUserStats] = useState(null)
   const [recentOrders, setRecentOrders] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let isMounted = true
     const load = async () => {
       try {
         const [ordRes, userRes, listRes] = await Promise.all([
-          axios.get(`${url}/api/order/analytics`, { headers: { token } }),
-          axios.get(`${url}/api/user/analytics`, { headers: { token } }),
-          axios.get(`${url}/api/order/list?limit=5`, { headers: { token } }),
+          adminServices.orders.getAnalytics(),
+          adminServices.users.getAnalytics(),
+          adminServices.orders.list({ limit: 5 }),
         ])
+        if (!isMounted) return
         if (ordRes.data.success) setOrderStats(ordRes.data.data)
         if (userRes.data.success) setUserStats(userRes.data.data)
         if (listRes.data.success) setRecentOrders(listRes.data.data)
-      } catch (e) { console.error(e) }
-      finally { setLoading(false) }
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
     }
     load()
-  }, [url, token])
-
-  const STATUS_COLORS = {
-    pending: '#e0a050', confirmed: '#4ecdc4', processing: '#7c6ae0',
-    ready: '#52b788', out_for_delivery: '#e07c3a', delivered: '#52b788', cancelled: '#e55353',
-  }
+    return () => { isMounted = false }
+  }, [])
 
   if (loading) return <div className="loading-center"><div className="spinner" /></div>
 
@@ -91,7 +94,7 @@ const Dashboard = ({ url, token }) => {
       <div className="admin-card">
         <div className="dash-section-header">
           <h3 className="dash-section-title">Recent Orders</h3>
-          <a href="/orders" className="dash-view-all">View All →</a>
+          <Link to="/orders" className="dash-view-all">View All →</Link>
         </div>
         {recentOrders.length === 0 ? (
           <div className="dash-empty">No orders yet.</div>
@@ -132,9 +135,9 @@ const Dashboard = ({ url, token }) => {
                     <span
                       className="status-badge"
                       style={{
-                        color: STATUS_COLORS[order.status],
-                        borderColor: STATUS_COLORS[order.status] + '40',
-                        background: STATUS_COLORS[order.status] + '15',
+                        color: ORDER_STATUS_COLORS[order.status],
+                        borderColor: ORDER_STATUS_COLORS[order.status] + '40',
+                        background: ORDER_STATUS_COLORS[order.status] + '15',
                       }}
                     >
                       {order.status}

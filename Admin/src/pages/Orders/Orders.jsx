@@ -1,21 +1,12 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useState, useEffect, Fragment } from 'react'
 import { toast } from 'react-toastify'
+import adminServices from '../../services/adminServices.js'
+import { ORDER_STATUS_COLORS, ORDER_STATUS_LABELS } from '../../utils/adminUtils.js'
 import './Orders.css'
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'processing', 'ready', 'out_for_delivery', 'delivered', 'cancelled']
 
-const STATUS_COLORS = {
-  pending: '#e0a050', confirmed: '#4ecdc4', processing: '#7c6ae0',
-  ready: '#52b788', out_for_delivery: '#e07c3a', delivered: '#52b788', cancelled: '#e55353',
-}
-
-const STATUS_LABELS = {
-  pending: 'Pending', confirmed: 'Confirmed', processing: 'Processing',
-  ready: 'Ready', out_for_delivery: 'Out for Delivery', delivered: 'Delivered', cancelled: 'Cancelled',
-}
-
-const Orders = ({ url, token }) => {
+const Orders = ({ url }) => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
@@ -26,7 +17,7 @@ const Orders = ({ url, token }) => {
     setLoading(true)
     try {
       const params = filterStatus ? { status: filterStatus } : {}
-      const res = await axios.get(`${url}/api/order/list`, { headers: { token }, params })
+      const res = await adminServices.orders.list(params)
       if (res.data.success) setOrders(res.data.data)
     } catch (e) {
       toast.error('Failed to load orders')
@@ -40,10 +31,10 @@ const Orders = ({ url, token }) => {
   const updateStatus = async (orderId, status) => {
     setUpdatingId(orderId)
     try {
-      const res = await axios.post(`${url}/api/order/status`, { orderId, status }, { headers: { token } })
+      const res = await adminServices.orders.updateStatus(orderId, status)
       if (res.data.success) {
         setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status } : o))
-        toast.success(`Order status updated to "${STATUS_LABELS[status]}"`)
+        toast.success(`Order status updated to "${ORDER_STATUS_LABELS[status]}"`)
       }
     } catch (e) {
       toast.error('Error updating status')
@@ -94,9 +85,9 @@ const Orders = ({ url, token }) => {
               key={s}
               className={`orders-status-pill ${filterStatus === s ? 'active' : ''}`}
               onClick={() => setFilterStatus(filterStatus === s ? '' : s)}
-              style={filterStatus === s ? { color: STATUS_COLORS[s], borderColor: STATUS_COLORS[s] + '60', background: STATUS_COLORS[s] + '15' } : {}}
+              style={filterStatus === s ? { color: ORDER_STATUS_COLORS[s], borderColor: ORDER_STATUS_COLORS[s] + '60', background: ORDER_STATUS_COLORS[s] + '15' } : {}}
             >
-              {STATUS_LABELS[s]}
+              {ORDER_STATUS_LABELS[s]}
               {count > 0 && <span className="orders-status-count">{count}</span>}
             </button>
           )
@@ -110,7 +101,7 @@ const Orders = ({ url, token }) => {
         ) : orders.length === 0 ? (
           <div className="orders-empty">
             <span>📦</span>
-            <p>No orders {filterStatus ? `with status "${STATUS_LABELS[filterStatus]}"` : 'yet'}</p>
+            <p>No orders {filterStatus ? `with status "${ORDER_STATUS_LABELS[filterStatus]}"` : 'yet'}</p>
           </div>
         ) : (
           <table className="admin-table">
@@ -129,9 +120,8 @@ const Orders = ({ url, token }) => {
             </thead>
             <tbody>
               {orders.map(order => (
-                <>
+                <Fragment key={order._id}>
                   <tr
-                    key={order._id}
                     className={`order-row ${expanded === order._id ? 'expanded' : ''}`}
                     onClick={() => setExpanded(expanded === order._id ? null : order._id)}
                   >
@@ -179,10 +169,10 @@ const Orders = ({ url, token }) => {
                         value={order.status}
                         onChange={e => updateStatus(order._id, e.target.value)}
                         disabled={updatingId === order._id}
-                        style={{ color: STATUS_COLORS[order.status] }}
+                        style={{ color: ORDER_STATUS_COLORS[order.status] }}
                       >
                         {STATUS_OPTIONS.map(s => (
-                          <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                          <option key={s} value={s}>{ORDER_STATUS_LABELS[s]}</option>
                         ))}
                       </select>
                     </td>
@@ -273,7 +263,7 @@ const Orders = ({ url, token }) => {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>

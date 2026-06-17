@@ -3,32 +3,41 @@
 // ============================================================
 import { useEffect, useContext } from 'react'
 import { useSearchParams, useNavigate, Link } from 'react-router-dom'
-import axios from 'axios'
 import { StoreContext } from '../../context/StoreContext'
+import orderService from '../../services/orderService.js'
 
 const Verify = () => {
   const [searchParams] = useSearchParams()
   const success = searchParams.get('success')
   const orderId = searchParams.get('orderId')
-  const { url, clearCart } = useContext(StoreContext)
+  const { clearCart } = useContext(StoreContext)
   const navigate = useNavigate()
 
   useEffect(() => {
+    let timeoutId
+    let isMounted = true
+
     const verify = async () => {
       try {
-        const res = await axios.post(`${url}/api/order/verify`, { success, orderId })
+        const res = await orderService.verify(orderId, success)
+        if (!isMounted) return
         if (res.data.success) {
           clearCart()
-          setTimeout(() => navigate('/orders'), 3000)
+          timeoutId = setTimeout(() => navigate('/orders'), 3000)
         } else {
-          setTimeout(() => navigate('/cart'), 3000)
+          timeoutId = setTimeout(() => navigate('/cart'), 3000)
         }
       } catch (e) {
-        setTimeout(() => navigate('/'), 3000)
+        if (isMounted) timeoutId = setTimeout(() => navigate('/'), 3000)
       }
     }
     if (orderId) verify()
-  }, [orderId, success])
+
+    return () => {
+      isMounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [orderId, success, clearCart, navigate])
 
   const isSuccess = success === 'true'
 

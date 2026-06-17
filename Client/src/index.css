@@ -4,7 +4,8 @@
    Palette: Charcoal · Forest Green · Gold · Cream · Sage
    ============================================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap");
+/* Google Fonts are loaded via <link> tags in index.html (an @import here
+   would block CSS rendering — see index.html <head>) */
 
 /* ── CSS Custom Properties ── */
 :root {
@@ -454,16 +455,8 @@ ul {
 .strain-hybrid { color: var(--green-bright); }
 .strain-cbd { color: #4ecdc4; }
 
-/* ── Age gate ── */
-.age-gate-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-primary);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Age gate styles live in components/AgeGate/AgeGate.css (co-located,
+   not duplicated here) */
 
 /* ── Responsive grid helpers ── */
 .grid-2 {

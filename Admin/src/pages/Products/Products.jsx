@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
+import adminServices from '../../services/adminServices.js'
+import { getImageUrl } from '../../utils/adminUtils.js'
 import './Products.css'
 
-const Products = ({ url, token }) => {
+const Products = ({ url }) => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -21,7 +22,7 @@ const Products = ({ url, token }) => {
       if (search) params.search = search
       if (category && category !== 'All') params.category = category
       params.limit = 100
-      const res = await axios.get(`${url}/api/product/list`, { params })
+      const res = await adminServices.products.getAll(params)
       if (res.data.success) setProducts(res.data.data)
     } catch (e) {
       toast.error('Failed to load products')
@@ -34,7 +35,7 @@ const Products = ({ url, token }) => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await axios.post(`${url}/api/product/remove`, { id }, { headers: { token } })
+      const res = await adminServices.products.remove(id)
       if (res.data.success) {
         toast.success('Product removed')
         setProducts(prev => prev.filter(p => p._id !== id))
@@ -49,11 +50,7 @@ const Products = ({ url, token }) => {
 
   const toggleStock = async (product) => {
     try {
-      const res = await axios.put(
-        `${url}/api/product/${product._id}`,
-        { inStock: !product.inStock },
-        { headers: { token } }
-      )
+      const res = await adminServices.products.update(product._id, { inStock: !product.inStock })
       if (res.data.success) {
         setProducts(prev => prev.map(p => p._id === product._id ? { ...p, inStock: !p.inStock } : p))
         toast.success(`${product.name} marked as ${!product.inStock ? 'In Stock' : 'Out of Stock'}`)
@@ -149,7 +146,7 @@ const Products = ({ url, token }) => {
             </thead>
             <tbody>
               {filteredProducts.map(product => {
-                const imgSrc = product.image ? `${url}/images/${product.image}` : null
+                const imgSrc = getImageUrl(product.image, url)
                 const displayPrice = product.salePrice || product.price
                 return (
                   <tr key={product._id}>

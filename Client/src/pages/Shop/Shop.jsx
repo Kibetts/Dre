@@ -1,31 +1,15 @@
 import { useContext, useEffect, useState, useCallback } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
-import axios from 'axios'
 import { StoreContext } from '../../context/StoreContext'
 import ProductCard from '../../components/ProductCard/ProductCard'
+import productService from '../../services/productService.js'
+import { SORT_OPTIONS, STRAIN_TYPES as STRAINS, EFFECTS_LIST } from '../../utils/constants.js'
 import './Shop.css'
-
-const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest' },
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'rating', label: 'Top Rated' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-]
-
-const STRAINS = [
-  { value: 'indica', label: 'Indica' },
-  { value: 'sativa', label: 'Sativa' },
-  { value: 'hybrid', label: 'Hybrid' },
-  { value: 'cbd', label: 'CBD' },
-]
-
-const EFFECTS_LIST = ['Relaxed', 'Happy', 'Euphoric', 'Creative', 'Focused', 'Sleepy', 'Energetic', 'Uplifted', 'Hungry', 'Talkative']
 
 const Shop = () => {
   const { category: categoryParam } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { categories, url } = useContext(StoreContext)
+  const { categories } = useContext(StoreContext)
 
   const [products, setProducts] = useState([])
   const [pagination, setPagination] = useState({})
@@ -54,7 +38,7 @@ const Shop = () => {
     try {
       const params = {}
       Object.entries(filters).forEach(([k, v]) => { if (v) params[k] = v })
-      const res = await axios.get(`${url}/api/product/list`, { params })
+      const res = await productService.getAll(params)
       if (res.data.success) {
         setProducts(res.data.data)
         setPagination(res.data.pagination || {})
@@ -64,7 +48,7 @@ const Shop = () => {
     } finally {
       setLoading(false)
     }
-  }, [filters, url])
+  }, [filters])
 
   useEffect(() => {
     fetchProducts()

@@ -1,26 +1,30 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { toast } from 'react-toastify'
+import adminServices from '../../services/adminServices.js'
+import { formatDate } from '../../utils/adminUtils.js'
 import './Customers.css'
 
-const Customers = ({ url, token }) => {
+const Customers = () => {
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
   useEffect(() => {
+    let isMounted = true
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get(`${url}/api/user/list`, { headers: { token } })
+        const res = await adminServices.users.list()
+        if (!isMounted) return
         if (res.data.success) setCustomers(res.data.data)
       } catch (e) {
         toast.error('Failed to load customers')
       } finally {
-        setLoading(false)
+        if (isMounted) setLoading(false)
       }
     }
     fetchCustomers()
-  }, [url, token])
+    return () => { isMounted = false }
+  }, [])
 
   const filtered = customers.filter(c =>
     c.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -131,7 +135,7 @@ const Customers = ({ url, token }) => {
                   </td>
                   <td>
                     <span className="customer-date">
-                      {new Date(customer.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {formatDate(customer.createdAt)}
                     </span>
                   </td>
                   <td>

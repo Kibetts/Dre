@@ -1,8 +1,10 @@
 import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 import { StoreContext } from '../../context/StoreContext'
+import couponService from '../../services/couponService.js'
+import { CA_TAX_RATE } from '../../utils/constants.js'
+import { getImageUrl } from '../../utils/helpers.js'
 import './Cart.css'
 
 const Cart = () => {
@@ -12,13 +14,10 @@ const Cart = () => {
   const [couponLoading, setCouponLoading] = useState(false)
   const navigate = useNavigate()
 
-  const TAX_RATE = 0.0975
-  const DELIVERY_FEE = 9.99
-
   const cartProducts = products.filter(p => cartItems[p._id] > 0)
   const subtotal = getTotalCartAmount()
   const discount = couponData ? couponData.discountAmount : 0
-  const tax = (subtotal - discount) * TAX_RATE
+  const tax = (subtotal - discount) * CA_TAX_RATE
   const total = subtotal - discount + tax
 
   const handleApplyCoupon = async () => {
@@ -26,10 +25,7 @@ const Cart = () => {
     if (!token) { toast.info('Please sign in to apply coupons'); return }
     setCouponLoading(true)
     try {
-      const res = await axios.post(`${url}/api/coupon/validate`,
-        { code: couponCode, orderAmount: subtotal },
-        { headers: { token } }
-      )
+      const res = await couponService.validate(couponCode, subtotal)
       if (res.data.success) {
         setCouponData(res.data.data)
         toast.success(res.data.message)
@@ -90,7 +86,7 @@ const Cart = () => {
             {cartProducts.map(product => {
               const qty = cartItems[product._id]
               const price = product.salePrice || product.price
-              const imgSrc = product.image ? `${url}/images/${product.image}` : null
+              const imgSrc = getImageUrl(product.image, url)
 
               return (
                 <div key={product._id} className="cart-item">

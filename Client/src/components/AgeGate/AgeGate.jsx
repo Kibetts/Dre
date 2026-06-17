@@ -1,62 +1,62 @@
-import { Route, Routes, useLocation } from 'react-router-dom'
-import { useContext, useEffect } from 'react'
-import { ToastContainer } from 'react-toastify'
-import { StoreContext } from './context/StoreContext'
-import Navbar from './components/Navbar/Navbar'
-import Footer from './components/Footer/Footer'
-import AgeGate from './components/AgeGate/AgeGate'
-import Home from './pages/Home/Home'
-import Shop from './pages/Shop/Shop'
-import ProductDetail from './pages/ProductDetail/ProductDetail'
-import Cart from './pages/Cart/Cart'
-import Checkout from './pages/Checkout/Checkout'
-import Verify from './pages/Verify/Verify'
-import MyOrders from './pages/MyOrders/MyOrders'
-import Profile from './pages/Profile/Profile'
-import Wishlist from './pages/Wishlist/Wishlist'
-import FloatingCart from './components/FloatingCart/FloatingCart'
 
-const App = () => {
-  const { ageVerified } = useContext(StoreContext)
-  const { pathname } = useLocation()
+import { useContext, useState } from 'react'
+import { StoreContext } from '../../context/StoreContext'
+import './AgeGate.css'
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [pathname])
+const AgeGate = () => {
+  const { verifyAge } = useContext(StoreContext)
+  const [exiting, setExiting] = useState(false)
 
-  if (!ageVerified) {
-    return <AgeGate />
+  const handleConfirm = () => {
+    verifyAge()
+  }
+
+  const handleDeny = () => {
+    setExiting(true)
+    window.location.href = 'https://www.google.com'
   }
 
   return (
-    <div className="app-container">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        theme="dark"
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-      />
-      <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/shop/:category" element={<Shop />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/verify" element={<Verify />} />
-          <Route path="/orders" element={<MyOrders />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-        </Routes>
-      </main>
-      <Footer />
-      <FloatingCart />
+    <div className="age-gate-overlay">
+      <div className="age-gate-card fade-up">
+        <div className="age-gate-logo">
+          <span className="age-gate-leaf">🌿</span>
+          <span className="age-gate-brand">GreenLeaf</span>
+        </div>
+
+        <div className="age-gate-divider" />
+
+        <h1 className="age-gate-title">Are You 21 or Older?</h1>
+        <p className="age-gate-subtitle">
+          This website features products intended for adults 21 years of age and older.
+          Please verify your age before entering.
+        </p>
+
+        <div className="age-gate-legal">
+          <p>By entering this site, you confirm that:</p>
+          <ul>
+            <li>You are at least 21 years of age, or 18+ with a valid medical card</li>
+            <li>You will comply with all California cannabis regulations</li>
+            <li>You understand cannabis products have not been approved by the FDA</li>
+          </ul>
+        </div>
+
+        <div className="age-gate-actions">
+          <button className="btn btn-primary age-gate-yes" onClick={handleConfirm} disabled={exiting}>
+            I am 21+ — Enter Site
+          </button>
+          <button className="btn btn-ghost age-gate-no" onClick={handleDeny} disabled={exiting}>
+            I am under 21 — Exit
+          </button>
+        </div>
+
+        <p className="age-gate-disclaimer">
+          GreenLeaf Dispensary is a licensed California cannabis retailer. CA License #C10-0000123-LIC.
+          Keep all cannabis products out of reach of children and pets.
+        </p>
+      </div>
     </div>
   )
 }
 
-export default App
+export default AgeGate

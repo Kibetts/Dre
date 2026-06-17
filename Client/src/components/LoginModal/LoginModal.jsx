@@ -1,11 +1,12 @@
 import { useState, useContext } from 'react'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 import { StoreContext } from '../../context/StoreContext'
+import userService from '../../services/userService.js'
+import { validateEmail, validateAge, validatePassword } from '../../utils/validators.js'
 import './LoginModal.css'
 
 const LoginModal = ({ onClose }) => {
-  const { url, login } = useContext(StoreContext)
+  const { login } = useContext(StoreContext)
   const [mode, setMode] = useState('login') // login | register
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState({
@@ -18,14 +19,29 @@ const LoginModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (!validateEmail(data.email)) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+    if (!validatePassword(data.password)) {
+      toast.error('Password must be at least 8 characters')
+      return
+    }
+    if (mode === 'register' && !validateAge(data.dateOfBirth, 21)) {
+      toast.error('You must be 21 or older to create an account')
+      return
+    }
+
     setLoading(true)
     try {
-      const endpoint = mode === 'login' ? '/api/user/login' : '/api/user/register'
       const payload = mode === 'login'
         ? { email: data.email, password: data.password }
         : data
 
-      const res = await axios.post(url + endpoint, payload)
+      const res = mode === 'login'
+        ? await userService.login(payload.email, payload.password)
+        : await userService.register(payload)
 
       if (res.data.success) {
         await login(res.data.token, res.data.user)

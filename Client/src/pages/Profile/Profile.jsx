@@ -1,23 +1,26 @@
 import { useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { StoreContext } from '../../context/StoreContext'
+import userService from '../../services/userService.js'
 import './Profile.css'
 
 const Profile = () => {
-  const { token, user, url, logout } = useContext(StoreContext)
+  const { token, logout } = useContext(StoreContext)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('profile')
   const [form, setForm] = useState({ name: '', phone: '', newsletterSubscribed: false })
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!token) return
+    let isMounted = true
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${url}/api/user/profile`, { headers: { token } })
+        const res = await userService.getProfile()
+        if (!isMounted) return
         if (res.data.success) {
           setProfile(res.data.data)
           setForm({
@@ -27,16 +30,17 @@ const Profile = () => {
           })
         }
       } catch (e) { console.error(e) }
-      finally { setLoading(false) }
+      finally { if (isMounted) setLoading(false) }
     }
     fetchProfile()
-  }, [token, url])
+    return () => { isMounted = false }
+  }, [token])
 
   const handleSave = async e => {
     e.preventDefault()
     setSaving(true)
     try {
-      const res = await axios.put(`${url}/api/user/profile`, form, { headers: { token } })
+      const res = await userService.updateProfile(form)
       if (res.data.success) {
         setProfile(res.data.data)
         toast.success('Profile updated successfully')
@@ -92,8 +96,8 @@ const Profile = () => {
                   key={tab.id}
                   className={`profile-nav-item ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => {
-                    if (tab.id === 'orders') window.location.href = '/orders'
-                    else if (tab.id === 'wishlist') window.location.href = '/wishlist'
+                    if (tab.id === 'orders') navigate('/orders')
+                    else if (tab.id === 'wishlist') navigate('/wishlist')
                     else setActiveTab(tab.id)
                   }}
                 >
