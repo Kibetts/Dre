@@ -1,16 +1,19 @@
 import mongoose from 'mongoose'
 
-const categorySchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  slug: { type: String, required: true, unique: true },
+const couponSchema = new mongoose.Schema({
+  code: { type: String, required: true, unique: true, uppercase: true, trim: true },
   description: { type: String },
-  image: { type: String },
-  icon: { type: String },
-  displayOrder: { type: Number, default: 0 },
+  discountType: { type: String, enum: ['percentage', 'fixed'], required: true, default: 'percentage' },
+  discountValue: { type: Number, required: true },
+  minimumOrder: { type: Number, default: 0 },
+  maximumDiscount: { type: Number, default: null },
+  usageLimit: { type: Number, default: null },
+  usedCount: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true },
-  productCount: { type: Number, default: 0 }
+  expiresAt: { type: Date, default: null },
+  createdAt: { type: Date, default: Date.now }
 })
 
-const categoryModel = mongoose.models.category || mongoose.model('category', categorySchema)
+const couponModel = mongoose.models.coupon || mongoose.model('coupon', couponSchema)
 
-export default categoryModel
+export default couponModel

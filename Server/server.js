@@ -16,6 +16,10 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not set. Add it to your .env file before starting the server.')
+}
+
 const app = express()
 const port = process.env.PORT || 4000
 
